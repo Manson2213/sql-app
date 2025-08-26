@@ -115,43 +115,21 @@ def get_item_details(item_id):
         return {}
 
 def generate_pdf_report(item_data):
-    """生成PDF報告 - 支援中文字體"""
+    """生成PDF報告 - 英文版本適用於雲端部署"""
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4)
     styles = getSampleStyleSheet()
     story = []
     
-    # 註冊中文字體
-    from reportlab.pdfbase import pdfmetrics
-    from reportlab.pdfbase.ttfonts import TTFont
-    from reportlab.lib.styles import ParagraphStyle
-    
-    try:
-        # 嘗試註冊中文字體（Windows系統）
-        pdfmetrics.registerFont(TTFont('SimSun', 'C:/Windows/Fonts/simsun.ttc'))
-        chinese_style = ParagraphStyle(
-            'Chinese',
-            parent=styles['Normal'],
-            fontName='SimSun',
-            fontSize=12,
-            leading=16
-        )
-        title_style = ParagraphStyle(
-            'ChineseTitle',
-            parent=styles['Title'],
-            fontName='SimSun',
-            fontSize=18,
-            leading=22
-        )
-    except:
-        # 如果中文字體載入失敗，使用預設字體
-        chinese_style = styles['Normal']
-        title_style = styles['Title']
+    # 使用預設字體樣式
+    chinese_style = styles['Normal']
+    title_style = styles['Title']
     
     # 標題
-    title = Paragraph("銷售資料列印報告", title_style)
+    title = Paragraph("Sales Data Report", title_style)
     story.append(title)
     story.append(Spacer(1, 0.3*inch))
+
     
     # 銷售資訊
     content = [
