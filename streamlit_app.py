@@ -115,18 +115,59 @@ def get_item_details(item_id):
         return {}
 
 def generate_pdf_report(item_data):
-    """生成PDF報告 - 英文版本適用於雲端部署"""
+    """生成PDF報告 - 使用系統相容中文字體"""
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4)
     styles = getSampleStyleSheet()
     story = []
     
-    # 使用預設字體樣式
-    chinese_style = styles['Normal']
-    title_style = styles['Title']
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    from reportlab.lib.styles import ParagraphStyle
+    import os
     
-    # 標題
-    title = Paragraph("Sales Data Report", title_style)
+    try:
+        # 嘗試多個可能的中文字體路徑（Linux 系統）
+        font_paths = [
+            '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+            '/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf',
+            '/System/Library/Fonts/PingFang.ttc',  # macOS
+        ]
+        
+        font_registered = False
+        for font_path in font_paths:
+            try:
+                if os.path.exists(font_path):
+                    pdfmetrics.registerFont(TTFont('ChineseFont', font_path))
+                    font_registered = True
+                    break
+            except:
+                continue
+        
+        if font_registered:
+            chinese_style = ParagraphStyle(
+                'Chinese',
+                parent=styles['Normal'],
+                fontName='ChineseFont',
+                fontSize=12,
+                leading=16
+            )
+            title_style = ParagraphStyle(
+                'ChineseTitle',
+                parent=styles['Title'],
+                fontName='ChineseFont',
+                fontSize=18,
+                leading=22
+            )
+        else:
+            raise Exception("無法找到中文字體")
+    except:
+        # 使用預設字體但保持中文文字
+        chinese_style = styles['Normal']
+        title_style = styles['Title']
+    
+    # 標題 - 保持中文
+    title = Paragraph("銷售資料列印報告", title_style)
     story.append(title)
     story.append(Spacer(1, 0.3*inch))
 
