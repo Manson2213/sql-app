@@ -396,7 +396,7 @@ def main():
                 {"項目": "三級分類", "內容": selected_item.get('category_l3', 'N/A')}
             ])
             
-            st.dataframe(detail_df, hide_index=True, use_container_width=True)
+            st.dataframe(detail_df, hide_index=True, width='stretch')
     
     with col2:
         st.header("🖨️ 列印操作")
@@ -407,7 +407,7 @@ def main():
             st.info(f"📄 將列印: {selected_item.get('name', 'N/A')}")
             
             # 列印按鈕
-            if st.button("🖨️ 立即列印", type="primary", use_container_width=True):
+            if st.button("🖨️ 立即列印", type="primary", width='stretch'):
                 with st.spinner("正在準備列印..."):
                     try:
                         # 生成PDF
@@ -429,7 +429,7 @@ def main():
                             data=pdf_data,
                             file_name=f"product_{selected_item.get('id', 'unknown')}.pdf",
                             mime="application/pdf",
-                            use_container_width=True
+                            width='stretch'
                         )
                         
                     except Exception as e:
