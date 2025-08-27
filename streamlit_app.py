@@ -115,7 +115,7 @@ def get_item_details(item_id):
         return {}
 
 def generate_pdf_report(item_data):
-    """生成PDF報告 - 使用系統相容中文字體"""
+    """生成PDF報告 - 使用專案內中文字體"""
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4)
     styles = getSampleStyleSheet()
@@ -127,24 +127,12 @@ def generate_pdf_report(item_data):
     import os
     
     try:
-        # 嘗試多個可能的中文字體路徑（Linux 系統）
-        font_paths = [
-            '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
-            '/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf',
-            '/System/Library/Fonts/PingFang.ttc',  # macOS
-        ]
+        # 使用專案內的中文字體檔案
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        font_path = os.path.join(current_dir, 'fonts', 'NotoSansTC-Regular.ttf')
         
-        font_registered = False
-        for font_path in font_paths:
-            try:
-                if os.path.exists(font_path):
-                    pdfmetrics.registerFont(TTFont('ChineseFont', font_path))
-                    font_registered = True
-                    break
-            except:
-                continue
-        
-        if font_registered:
+        if os.path.exists(font_path):
+            pdfmetrics.registerFont(TTFont('ChineseFont', font_path))
             chinese_style = ParagraphStyle(
                 'Chinese',
                 parent=styles['Normal'],
@@ -159,10 +147,17 @@ def generate_pdf_report(item_data):
                 fontSize=18,
                 leading=22
             )
+            st.success("中文字體載入成功！")
+            font_success = True
         else:
-            raise Exception("無法找到中文字體")
-    except:
-        # 使用預設字體但保持中文文字
+            st.warning("字體檔案不存在，使用預設字體")
+            font_success = False
+    except Exception as e:
+        st.error(f"字體載入失敗：{str(e)}")
+        font_success = False
+    
+    # 如果字體載入失敗，使用預設字體
+    if not font_success:
         chinese_style = styles['Normal']
         title_style = styles['Title']
     
