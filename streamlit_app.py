@@ -2,6 +2,8 @@ import streamlit as st
 import requests
 import base64
 import pandas as pd
+import os
+import json
 from datetime import datetime
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -9,7 +11,10 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.units import inch
 from io import BytesIO
-import json
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.styles import ParagraphStyle
+
 
 # 頁面配置
 st.set_page_config(
@@ -120,11 +125,6 @@ def generate_pdf_report(item_data):
     doc = SimpleDocTemplate(buffer, pagesize=A4)
     styles = getSampleStyleSheet()
     story = []
-    
-    from reportlab.pdfbase import pdfmetrics
-    from reportlab.pdfbase.ttfonts import TTFont
-    from reportlab.lib.styles import ParagraphStyle
-    import os
     
     try:
         # 使用專案內的中文字體檔案
