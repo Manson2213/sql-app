@@ -125,42 +125,6 @@ def generate_pdf_report(item_data):
     from reportlab.pdfbase.ttfonts import TTFont
     from reportlab.lib.styles import ParagraphStyle
     import os
-
-    # 立即顯示除錯資訊
-    st.write("=== 字體檔案除錯資訊 ===")
-    st.write(f"當前工作目錄：{os.getcwd()}")
-    
-    try:
-        root_files = os.listdir('.')
-        st.write(f"根目錄檔案：{root_files}")
-        
-        if 'fonts' in root_files:
-            st.write("✅ fonts 目錄存在")
-            try:
-                font_files = os.listdir('./fonts')
-                st.write(f"fonts 目錄檔案：{font_files}")
-            except Exception as e:
-                st.write(f"❌ 無法讀取 fonts 目錄：{e}")
-        else:
-            st.write("❌ fonts 目錄不存在於根目錄")
-            
-    except Exception as e:
-        st.write(f"❌ 讀取目錄時發生錯誤：{e}")
-    
-    # 測試字體檔案路徑
-    font_paths = [
-        'fonts/NotoSansTC-Regular.ttf',
-        './fonts/NotoSansTC-Regular.ttf',
-        'NotoSansTC-Regular.ttf',
-        './NotoSansTC-Regular.ttf'
-    ]
-    
-    st.write("路徑檢測結果：")
-    for path in font_paths:
-        exists = os.path.exists(path)
-        st.write(f"- {path}: {'✅存在' if exists else '❌不存在'}")
-    
-    st.write("=== 除錯資訊結束 ===")
     
     try:
         # 使用專案內的中文字體檔案
