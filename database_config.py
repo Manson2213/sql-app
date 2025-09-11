@@ -210,3 +210,80 @@ def init_sample_data():
     except Exception as e:
         logger.error(f"範例資料初始化失敗: {str(e)}")
         raise e
+
+def ensure_customer_table():
+    """確保客戶資料表存在（不插入示範資料）"""
+    try:
+        # 檢查表是否存在
+        tables = get_tables()
+        if 'customers' in tables:
+            logger.info("客戶資料表已存在")
+            return
+        
+        # 建立客戶資料表
+        create_customer_table_sql = """
+        CREATE TABLE customers (
+            member_id VARCHAR(20) PRIMARY KEY,
+            name VARCHAR(100) NOT NULL,
+            phone VARCHAR(20),
+            email VARCHAR(100),
+            address TEXT,
+            join_date DATE,
+            status VARCHAR(20) DEFAULT '活躍',
+            level VARCHAR(20) DEFAULT '一般會員',
+            points INTEGER DEFAULT 0,
+            last_visit DATE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+        
+        execute_query(create_customer_table_sql)
+        logger.info("客戶資料表建立完成")
+        
+    except Exception as e:
+        logger.error(f"客戶資料表操作失敗: {str(e)}")
+        # 不拋出異常，允許程序繼續運行
+        pass
+
+def search_customers(query=None, search_type="all"):
+    """搜尋客戶資料"""
+    try:
+        if not query:
+            # 如果沒有查詢條件，返回所有客戶（限制20筆）
+            sql = "SELECT * FROM sample_customers ORDER BY last_visit DESC LIMIT 20"
+            return execute_query(sql)
+        
+        # 根據搜尋類型構建查詢
+        if search_type == "member_id":
+            sql = "SELECT * FROM sample_customers WHERE member_id LIKE :query"
+        elif search_type == "name":
+            sql = "SELECT * FROM sample_customers WHERE name LIKE :query"
+        elif search_type == "phone":
+            sql = "SELECT * FROM sample_customers WHERE phone LIKE :query"
+        else:  # search_type == "all"
+            sql = """
+            SELECT * FROM sample_customers
+            WHERE member_id LIKE :query
+               OR name LIKE :query
+               OR phone LIKE :query
+               OR email LIKE :query
+            ORDER BY last_visit DESC
+            """
+        
+        # 為模糊搜尋添加萬用字符
+        search_query = f"%{query}%"
+        return execute_query(sql, {"query": search_query})
+        
+    except Exception as e:
+        logger.error(f"客戶搜尋失敗: {str(e)}")
+        raise e
+
+def get_customer_by_id(member_id):
+    """根據會員編號獲取客戶資料"""
+    try:
+        sql = "SELECT * FROM sample_customers WHERE member_id = :member_id"
+        result = execute_query(sql, {"member_id": member_id})
+        return result[0] if result else None
+    except Exception as e:
+        logger.error(f"獲取客戶資料失敗: {str(e)}")
+        raise e
